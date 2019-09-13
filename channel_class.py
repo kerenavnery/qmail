@@ -71,6 +71,7 @@ class Channel:
         new_circuit = QuantumCircuit(len(recieve_channel._state_vector.dims()))
         new_circuit.initialize(recieve_channel._state_vector.data, range(len(recieve_channel._state_vector.dims())))
         new_circuit = transpile(new_circuit, basis_gates=self._basis_gates)
+        new_circuit = new_circuit + circuit
         return recieve_channel._circuit, self._offset
 
         return new_circuit, self._offset   
