@@ -7,5 +7,5 @@ from SocketChannel import SocketChannel
 channel = SocketChannel(port=5005, listen=True)
 
 data = channel.receive()
-print("received data:", data)
+print("received data:", data.decode("utf-8"))
 channel.close()
