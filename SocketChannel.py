@@ -15,8 +15,8 @@ class SocketChannel:
     self.BUFFER_SIZE = 2048
     self.MSGLEN = 2048
     if listen:
-      # self.sock.bind(('127.0.0.1', self.TCP_PORT))
-      self.sock.bind((socket.gethostname(), self.TCP_PORT))
+      self.sock.bind(('127.0.0.1', self.TCP_PORT))
+      # self.sock.bind((socket.gethostname(), self.TCP_PORT))
       self.sock.listen(1)
       self.sock, addr = self.sock.accept()
       print('Connection address:', addr)
