@@ -5,7 +5,7 @@ from channel_class import Channel
 #Bob Part
 circ_bob = QuantumCircuit(3)
 
-bob_channel = Channel()
+bob_channel = Channel(myport = 5001, remote_port = 5000)
 circ_bob, offset = bob_channel.receive(circ_bob)#,to_tpc)
 circ_bob.draw()
 

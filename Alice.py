@@ -9,7 +9,7 @@ slave_offset = n_master
 
 circ = QuantumCircuit(n_master + n_slave)
 
-channel = Channel(slave_offset)
+channel = Channel(slave_offset, 5000, remote_port = 5001)
 
 ## Master
 circ.h(0 + channel._offset)
@@ -40,7 +40,8 @@ circ_bob.draw()
 #Alice Part
 circ_alice = QuantumCircuit(3)
 
-alice_channel = Channel()
+alice_channel = channel #Channel()
+alice_channel._slave_offset = 0
 circ_alice , offset = alice_channel.receive(circ_alice)#,to_tpc)
 circ_alice.draw()
 
