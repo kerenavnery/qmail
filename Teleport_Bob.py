@@ -9,7 +9,7 @@ circ_bob = QuantumCircuit(3)
 #circ_bob.h(0)
 #circ_bob.draw(output='mpl','test.png')
 
-bob_channel = Channel()
+bob_channel = Channel(myport = 5001, remote_port = 5000)
 circ_bob, offset = bob_channel.receive(circ_bob)#,to_tpc)
 
 # Add new gates to circ2
@@ -38,7 +38,7 @@ meas.barrier(range(3))
 meas.measure([2],range(1))
 qc = circ_bob + meas
 
-channel.send(qc)
+#channel.send(qc)
 
 backend_sim = Aer.get_backend('qasm_simulator')
 job_sim = execute(qc,backend_sim,shots=1024)

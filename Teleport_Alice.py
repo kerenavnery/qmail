@@ -9,7 +9,7 @@ slave_offset = n_master
 
 circ = QuantumCircuit(n_master + n_slave)
 
-channel = Channel(slave_offset)
+channel = Channel(slave_offset, 5000, remote_port = 5001)
 
 ## Master, Oracle
 circ.rx(0.234,0 + channel._offset)
