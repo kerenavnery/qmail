@@ -44,7 +44,7 @@ class SocketChannel(threading.Thread):
 	def receive(self):
 		# TODO: Get element from queue or block if there is no element ready
 		msg = self.consumer()
-		print("Received: ", msg)
+		# print("Received: ", msg)
 		return msg
 		
 	async def ws_send(self, uri, msg):
@@ -52,41 +52,41 @@ class SocketChannel(threading.Thread):
 	    	await websocket.send(msg)
 
 	def producer(self, msg):
-		print("Producer: hola")
+		# print("Producer: hola")
 		while len(self.buff) >= self.BUFF_MAX_LEN:
-			print("Producer: buff is full, waiting...")
+			print("SocketChannel: buffer is full, waiting...")
 			time.sleep(1)
 		self.buff.append(msg)
 
 	def consumer(self):
-		print("Consumer: hola")
+		# print("Consumer: hola")
 		while len(self.buff) <= 0:
-			print("Consumer: the buff is empty, waiting...")
+			print("SocketChannel: the buff is empty, waiting...")
 			time.sleep(1)
 		msg = self.buff.pop()
 		return msg
 
+## EXAMPLE
+# # Initialize
+# alice = SocketChannel(1221, True)
+# bob = SocketChannel(1222, False)
+# print("hjkkhj")
 
-# Initialize
-alice = SocketChannel(1221, True)
-bob = SocketChannel(1222, False)
-print("hjkkhj")
+# alice.connect('localhost', 1222)
+# bob.connect('localhost', 1221)
 
-alice.connect('localhost', 1222)
-bob.connect('localhost', 1221)
+# # Send
+# print("asdf")
+# alice.send("Hello Alice here")
+# alice.send("Hello Alice here2")
+# alice.send("Hello Alice here3")
 
-# Send
-print("asdf")
-alice.send("Hello Alice here")
-alice.send("Hello Alice here2")
-alice.send("Hello Alice here3")
+# bob.send("Hello Bob here")
 
-bob.send("Hello Bob here")
-
-alice.receive()
-bob.receive()
-bob.receive()
-bob.receive()
+# alice.receive()
+# bob.receive()
+# bob.receive()
+# bob.receive()
 
 
 
