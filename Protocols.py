@@ -108,7 +108,7 @@ def send_a_qmail(message, batch_size=4):
     """
     nqubit = batch_size
 
-    print('Alice wants to send %s', message)
+    print('Alice wants to send %s'%message)
 
     #send message per batch bits
     Lbins = str_to_lbin(message, batch_size)
@@ -116,15 +116,16 @@ def send_a_qmail(message, batch_size=4):
     #generate key
     print('generating key...')
     otpkey = generate_otp_key(len(Lbins)*batch_size)
-    print(otpkey)
+    print('X-encryption key %s'%otpkey['x'], 'Z-encryption key %s'%otpkey['z'])
 
     key_per_batch = [{'x':x,'z':z} for x,z in zip(wrap(otpkey['x'],batch_size),wrap(otpkey['z'],batch_size))]
 
     bob_meas_results = []
     for bin_batch,k in zip(Lbins, key_per_batch):  
-        print('OTP for string', bin_batch)
+        print('Performing QOTP for string', bin_batch)
         qcirc = encode_cinfo_to_qstate(bin_batch) 
         bob_meas_results.append(qotp(qcirc, k))
+        print('Bob measures',bob_meas_results[-1])
  
     print('Bobs message %s'%bins_to_str(bob_meas_results))
     return bins_to_str(bob_meas_results)
