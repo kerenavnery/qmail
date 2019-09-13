@@ -41,7 +41,7 @@ circ_bob.draw()
 circ_alice = QuantumCircuit(3)
 
 alice_channel = Channel()
-circ_alice , offset = alice_channel.receive(circ_alice,to_tpc)
+circ_alice , offset = alice_channel.receive(circ_alice)#,to_tpc)
 circ_alice.draw()
 
 
