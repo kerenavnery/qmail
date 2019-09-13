@@ -9,4 +9,5 @@ channel = SocketChannel()
 channel.connect(TCP_IP, 5005)
 
 channel.send(str.encode(message))
+channel.send(str.encode("Hi"))
 channel.close()
