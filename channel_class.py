@@ -24,16 +24,20 @@ class Channel:
         TCP_IP = '127.0.0.1'
         self.realchannel.connect(TCP_IP, remote_port)
         
+        self._circuit = None
+        
     def send(self,circuit,arr_qubits):
         self._state_vector = Statevector.from_instruction(circuit)  
         self._arr_qubits = arr_qubits
-       
+        self._circuit = circuit      
+ 
         #From Marc
         ser = parser.QSerializer()
         ser.add_element('state_vector', self._state_vector)#self)
         ser.add_element('is_master', self._master)#self)
         ser.add_element('slave_offset', self._slave_offset)#self)
         ser.add_element('is_master', self._master)#self)
+        ser.add_element('circuit', self._circuit)#self)
         str_to_send = ser.encode()
 
         #print(str_to_send.type())
@@ -56,7 +60,8 @@ class Channel:
         print('Wait to receive')
         channel = self.realchannel #SocketChannel(port=5005, listen=True)
         data = channel.receive()
-        print("received data:", data)
+        print("received stuff \o/")
+        #print("received data:", data)
         channel.close()
         
         #From Marc
@@ -73,6 +78,9 @@ class Channel:
         new_circuit = QuantumCircuit(len(recieved_state_vector.dims()))
         new_circuit.initialize(recieved_state_vector.data, range(len(recieved_state_vector.dims())))
         new_circuit = transpile(new_circuit, basis_gates=self._basis_gates)
+        new_circuit = new_circuit + circuit
+        return ser2.get_element('circuit'), self._offset
+
         return new_circuit, self._offset   
 
 

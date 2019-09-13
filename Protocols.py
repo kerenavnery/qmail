@@ -5,11 +5,13 @@ from textwrap import wrap
 from random import randrange
 
 
+# Quantum One-Time pad related methods
+
 def str_to_lbin(message, bin_size=4):
     """
     String to 8 bit binary per character
 
-    :message: add the message
+    :message:str, the message
     """
     clist = [ord(x) for x in message]
     bins = ''.join([format(x,'08b') for x in clist])
@@ -100,11 +102,11 @@ def qotp(qcirc, otpkey):
 
 
 
-def send_a_qmail(message, batch_size=4):
+def send_a_qmail_local(message, batch_size=4):
     """ Alice sends to Bob a quantum email
 
     :nqubit:int, the number of qubits
-    :message:int,  
+    :message:str, the secret message that wants to be sent 
     """
     nqubit = batch_size
 
@@ -129,5 +131,8 @@ def send_a_qmail(message, batch_size=4):
  
     print('Bobs message %s'%bins_to_str(bob_meas_results))
     return bins_to_str(bob_meas_results)
+
+
+
 
 
