@@ -57,6 +57,49 @@ def generate_otp_key(key_length):
     return {'x': x_key, 'z': z_key}
 
 
+def otp_enc_dec(qcirc, otpkey):
+    """
+    :qcirc:QuantumCircuit instance
+    :key:dict={x:, z:}
+    """
+    r_x , r_z = otpkey['x'], otpkey['z']
+    for i,k in enumerate(zip(r_x,r_z)):
+        if k[0]:
+            qcirc.x(i)
+        if k[1]:
+            qcirc.z(i)
+
+
+
+def qotp(qcirc, otpkey):
+    """
+    Quantum one-time pad
+
+    :qmessage:qiksit.QuantumCircuit 
+    :key: dict{x:int y:int} 
+    :nqubit:int, the number of qubits
+    """
+    #Alice's part: encoding
+    otp_enc_dec(qcirc, otpkey)
+
+    #Alice send the qubits
+    #Channel stuff
+
+    #Bob receives qubits, and decrypt them
+    otp_enc_dec(qcirc, otpkey)
+
+    #Bob measure the states, single shot
+    simulator = Aer.get_backend('qasm_simulator')
+    nqubit = len(otpkey['x'])
+    for i in range(nqubit):
+        qcirc.measure(range(nqubit), range(nqubit))
+        counts = execute(qcirc, backend=simulator, shots = 1).result()
+
+    output = list(counts.get_counts().keys())[0] 
+    return output
+
+
+
 def send_a_qmail(message, batch_size=4):
     """ Alice sends to Bob a quantum email
 
@@ -86,39 +129,4 @@ def send_a_qmail(message, batch_size=4):
     print('Bobs message %s'%bins_to_str(bob_meas_results))
     return bins_to_str(bob_meas_results)
 
-
-def qotp(qcirc, otpkey):
-    """
-    Quantum one-time pad
-
-    :qmessage:qiksit.QuantumCircuit 
-    :key: dict{x:int y:int} 
-    :nqubit:int, the number of qubits
-    """
-    #Alice's part: encoding
-    r_x , r_z = otpkey['x'], otpkey['z']
-    for i,k in enumerate(zip(r_x,r_z)):
-        if k[0]:
-            qcirc.x(i)
-        if k[1]:
-            qcirc.z(i)
-
-    #Alice send the qubits
-    #Channel stuff
-
-    #Bob's part: decoding 
-    for i,k in enumerate(zip(r_x,r_z)):
-        if k[1]:
-            qcirc.z(i)
-        if k[0]:
-            qcirc.x(i)
-    #Bob measure the states, single shot
-    simulator = Aer.get_backend('qasm_simulator')
-    nqubit = len(r_x)
-    for i in range(nqubit):
-        qcirc.measure(range(nqubit), range(nqubit))
-        counts = execute(qcirc, backend=simulator, shots = 1).result()
-
-    output = list(counts.get_counts().keys())[0] 
-    return output
 
