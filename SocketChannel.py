@@ -1,4 +1,5 @@
 import socket
+import time
 
 class SocketChannel:
   """
@@ -11,6 +12,7 @@ class SocketChannel:
     """
 
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    self.sock.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
     self.TCP_PORT = port
     self.BUFFER_SIZE = 2048
     self.MSGLEN = 2048
@@ -28,7 +30,11 @@ class SocketChannel:
     self.sock.close()
 
   def send(self, msg):
-    self.sock.send(str.encode(msg))
+    """
+      @param
+        msg:  bytes
+    """
+    self.sock.sendall(msg)
     # totalsent = 0
     # while totalsent < self.MSGLEN:
     #   sent = self.sock.send(msg[totalsent:])
@@ -37,10 +43,13 @@ class SocketChannel:
     #   totalsent = totalsent + sent
 
   def receive(self):
+    """
+      @return bytes
+    """
     data = self.sock.recv(self.BUFFER_SIZE)
     # convert to string
-    datastr = data.decode("utf-8") 
-    return datastr
+    # datastr = data.decode("utf-8") 
+    return data
 
     # chunks = []
     # bytes_recd = 0
