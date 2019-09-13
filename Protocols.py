@@ -3,6 +3,8 @@ from qiskit import *
 from qiskit.quantum_info import Statevector
 from textwrap import wrap
 from random import randrange
+from SocketChannel2 import SocketChannel
+import pickle
 
 
 def str_to_lbin(message, bin_size=4):
@@ -83,7 +85,7 @@ def qotp(qcirc, otpkey):
     otp_enc_dec(qcirc, otpkey)
 
     #Alice send the qubits
-    #Channel stuff
+    #TODO:Channel stuff
 
     #Bob receives qubits, and decrypt them
     otp_enc_dec(qcirc, otpkey)
@@ -100,7 +102,7 @@ def qotp(qcirc, otpkey):
 
 
 
-def send_a_qmail(message, batch_size=4):
+def send_a_qmail(message, port, destAddr, destPort, batch_size=4):
     """ Alice sends to Bob a quantum email
 
     :nqubit:int, the number of qubits
@@ -109,6 +111,10 @@ def send_a_qmail(message, batch_size=4):
     nqubit = batch_size
 
     print('Alice wants to send %s'%message)
+    # Initialize with Bob
+    classicC = SocketChannel(port, False)
+    # connect to Bob
+    classicC.connect(destAddr, destPort)
 
     #send message per batch bits
     Lbins = str_to_lbin(message, batch_size)
@@ -117,6 +123,12 @@ def send_a_qmail(message, batch_size=4):
     print('generating key...')
     otpkey = generate_otp_key(len(Lbins)*batch_size)
     print('X-encryption key %s'%otpkey['x'], 'Z-encryption key %s'%otpkey['z'])
+
+    # send key to Bob
+    classicC.send(pickle.dumps(otpkey))
+    print("I am Alice I sent:", otpkey)
+    # close the classic channel as we don't need it anymore
+    classicC.close()
 
     key_per_batch = [{'x':x,'z':z} for x,z in zip(wrap(otpkey['x'],batch_size),wrap(otpkey['z'],batch_size))]
 
@@ -129,5 +141,17 @@ def send_a_qmail(message, batch_size=4):
  
     print('Bobs message %s'%bins_to_str(bob_meas_results))
     return bins_to_str(bob_meas_results)
+
+def receive_a_qmail(port, srcAddr, srcPort, batch_size=4):
+        # Initialize with Bob
+    classicC = SocketChannel(port, True)
+    # connect to Bob
+    classicC.connect(srcAddr, srcPort)
+
+    # receive otpkey from alice
+    otpkey = classicC.receive()
+    otpkey = pickle.loads(otpkey)
+    print("I am Bob I received: ", otpkey)
+    classicC.close()
 
 
