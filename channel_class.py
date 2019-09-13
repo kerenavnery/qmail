@@ -19,10 +19,13 @@ class Channel:
         self._offset = 0
         self._slave_offset = slave_offset
         
+        self._circuit = None
+        
     def send(self,circuit,arr_qubits):
         self._state_vector = Statevector.from_instruction(circuit)  
         self._arr_qubits = arr_qubits
-       
+        self._circuit = circuit      
+ 
         #From Marc
         ser = parser.QSerializer()
         ser.add_element('channel_class', self)
@@ -51,7 +54,8 @@ class Channel:
         print('Wait to receive')
         channel = SocketChannel(port=5005, listen=True)
         data = channel.receive()
-        print("received data:", data)
+        print("received stuff \o/")
+        #print("received data:", data)
         channel.close()
         
         #From Marc
@@ -67,6 +71,8 @@ class Channel:
         new_circuit = QuantumCircuit(len(recieve_channel._state_vector.dims()))
         new_circuit.initialize(recieve_channel._state_vector.data, range(len(recieve_channel._state_vector.dims())))
         new_circuit = transpile(new_circuit, basis_gates=self._basis_gates)
+        return recieve_channel._circuit, self._offset
+
         return new_circuit, self._offset   
 
 

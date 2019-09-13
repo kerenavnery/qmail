@@ -12,7 +12,7 @@ circ = QuantumCircuit(n_master + n_slave)
 channel = Channel(slave_offset)
 
 ## Master
-circ.h(0 + channel._offset)
+circ.x(0 + channel._offset)
 #circ.cx(0 + channel._offset, 1  + channel._offset)
 #irc.h(1 + channel._offset)
 
@@ -42,7 +42,5 @@ circ_alice = QuantumCircuit(3)
 
 alice_channel = Channel()
 circ_alice , offset = alice_channel.receive(circ_alice)#,to_tpc)
-circ_alice.draw()
-
-
+circ_alice.draw(output='mpl',filename='test.png')
 
