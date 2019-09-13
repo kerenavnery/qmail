@@ -41,7 +41,7 @@ def encode_cinfo_to_qstate(cinfo_bin):
     """
     nreg = len(cinfo_bin)
     qcirc = QuantumCircuit(nreg, nreg)
-    for i,bit_i in enumerate(cinfo_bin):
+    for i,bit_i in enumerate(cinfo_bin[::-1]):
         if int(bit_i):
             qcirc.x(i)
     return qcirc
@@ -74,7 +74,6 @@ def send_a_qmail(message, batch_size=4):
 
     key_per_batch = [{'x':x,'z':z} for x,z in zip(wrap(otpkey['x'],batch_size),wrap(otpkey['z'],batch_size))]
 
-    simulator = Aer.get_backend('qasm_simulator')
     bob_meas_results = []
     for bin_batch,k in zip(Lbins, key_per_batch):  
         qcirc = encode_cinfo_to_qstate(bin_batch) 
@@ -93,25 +92,26 @@ def qotp(qcirc, otpkey):
     """
     #Alice's part: encoding
     r_x , r_z = otpkey['x'], otpkey['z']
- #  for i,k in enumerate(zip(r_x,r_z)):
- #      if k[0]:
- #          qcirc.x(i)
- #      if k[1]:
- #          qcirc.z(i)
+    for i,k in enumerate(zip(r_x,r_z)):
+        if k[0]:
+            qcirc.x(i)
+        if k[1]:
+            qcirc.z(i)
 
- #  #Alice send the qubits
- #  #Channel stuff
+    #Alice send the qubits
+    #Channel stuff
 
- #  #Bob's part: decoding 
- #  for i,k in enumerate(zip(r_x,r_z)):
- #      if k[0]:
- #          qcirc.x(i)
- #      if k[1]:
- #          qcirc.z(i)
- #  #Bob measure the states, single shot
+    #Bob's part: decoding 
+    for i,k in enumerate(zip(r_x,r_z)):
+        if k[1]:
+            qcirc.z(i)
+        if k[0]:
+            qcirc.x(i)
+    #Bob measure the states, single shot
     simulator = Aer.get_backend('qasm_simulator')
     nqubit = len(r_x)
     for i in range(nqubit):
+        qcirc.measure(range(nqubit), range(nqubit))
         counts = execute(qcirc, backend=simulator, shots = 1).result()
 
     output = list(counts.get_counts().keys())[0] 
