@@ -1,4 +1,4 @@
-# qmail (Quantum Email)
+# qmail (Quantum Email and beyond)
 Qiskit Hackaton Quantum Mail Implementation (#38)
 
 ## Overview
