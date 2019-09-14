@@ -161,8 +161,6 @@ def receive_a_qmail(port, srcAddr, srcPort, batch_size=4, adversary=False):
     # connect to Bob
     classicC.connect(srcAddr, srcPort+10)
 
-    
-
     # receive otpkey from alice
     otpkey = classicC.receive()
     otpkey = pickle.loads(otpkey)
@@ -178,8 +176,33 @@ def receive_a_qmail(port, srcAddr, srcPort, batch_size=4, adversary=False):
     slave_offset = 0
     channel = Channel(slave_offset, port, remote_port=srcPort)
 
-# Grover-related methods
+    qcirc = None
+    # TODO: decrypt and measure
+    # Eve siVmulation
+    recv = "Eve" if adversary else "Bob"
+    bob_meas_results = []
+    for k in key_per_batch:
+        circ_bob = QuantumCircuit(batch_size, batch_size)
+        circ_bob, offset = channel.receive(circ_bob)
+        # circ_bob.draw(output='mpl',filename="teleport_alice%s.png".format(k))
+        #Bob receives qubits, and decrypt them
+        if not adversary:
+            otp_enc_dec(circ_bob, k)
+        #Bob measure the states, single shot
+        simulator = Aer.get_backend('qasm_simulator')
+        nqubit = len(otpkey['x'])
+        # for i in range(nqubit):
+        circ_bob.measure(np.arange(batch_size)+offset, range(batch_size))
+        counts = execute(circ_bob, backend=simulator, shots = 1).result()
 
+        output = list(counts.get_counts().keys())[0]
+        bob_meas_results.append(output)
+        print('%s measures'%recv, bob_meas_results[-1])
+    print('%ss message %s'%(recv, bins_to_str(bob_meas_results)))
+
+    return bins_to_str(bob_meas_results)
+
+# Grover-related methods
 def apply_grover_oracle2(qcirc, dquery):
     """
     grover oracle for query database: 
@@ -231,29 +254,3 @@ def multiparty_2grover_local(dquery):
     counts = execute(qcirc, backend=simulator, shots = 1).result()
 
     print("Alice measurement outcome", list(counts.get_counts().keys())[0])
-
-    qcirc = None
-    # TODO: decrypt and measure
-    # Eve siVmulation
-    recv = "Eve" if adversary else "Bob"
-    bob_meas_results = []
-    for k in key_per_batch:
-        circ_bob = QuantumCircuit(batch_size, batch_size)
-        circ_bob, offset = channel.receive(circ_bob)
-        # circ_bob.draw(output='mpl',filename="teleport_alice%s.png".format(k))
-        #Bob receives qubits, and decrypt them
-        if not adversary:
-            otp_enc_dec(circ_bob, k)
-        #Bob measure the states, single shot
-        simulator = Aer.get_backend('qasm_simulator')
-        nqubit = len(otpkey['x'])
-        # for i in range(nqubit):
-        circ_bob.measure(np.arange(batch_size)+offset, range(batch_size))
-        counts = execute(circ_bob, backend=simulator, shots = 1).result()
-
-        output = list(counts.get_counts().keys())[0]
-        bob_meas_results.append(output)
-        print('%s measures'%recv, bob_meas_results[-1])
-    print('%ss message %s'%(recv, bins_to_str(bob_meas_results)))
-
-    return bins_to_str(bob_meas_results)
