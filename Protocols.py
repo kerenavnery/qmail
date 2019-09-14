@@ -73,19 +73,20 @@ def otp_enc_dec(qcirc, otpkey):
 
 
 
-def qotp(qcirc, otpkey):
+def qotp(qcirc, otpkey, qChannel=None):
     """
     Quantum one-time pad
 
     :qmessage:qiksit.QuantumCircuit 
-    :key: dict{x:int y:int} 
-    :nqubit:int, the number of qubits
+    :otpkey: dict{x:int y:int} 
+    :qChannel: quantum channel
     """
     #Alice's part: encoding
     otp_enc_dec(qcirc, otpkey)
 
     #Alice send the qubits
     #TODO:Channel stuff
+    # send over Qchannel
 
     #Bob receives qubits, and decrypt them
     otp_enc_dec(qcirc, otpkey)
@@ -132,14 +133,16 @@ def send_a_qmail(message, port, destAddr, destPort, batch_size=4):
 
     key_per_batch = [{'x':x,'z':z} for x,z in zip(wrap(otpkey['x'],batch_size),wrap(otpkey['z'],batch_size))]
 
-    bob_meas_results = []
+    # TODO: setup quantum channel
+
+    bob_meas_results = [] # Bob
     for bin_batch,k in zip(Lbins, key_per_batch):  
         print('Performing QOTP for string', bin_batch)
-        qcirc = encode_cinfo_to_qstate(bin_batch) 
-        bob_meas_results.append(qotp(qcirc, k))
-        print('Bob measures',bob_meas_results[-1])
+        qcirc = encode_cinfo_to_qstate(bin_batch) # Alice
+        bob_meas_results.append(qotp(qcirc, k)) # Bob
+        print('Bob measures',bob_meas_results[-1]) # Bob
  
-    print('Bobs message %s'%bins_to_str(bob_meas_results))
+    print('Bobs message %s'%bins_to_str(bob_meas_results)) #Bob
     return bins_to_str(bob_meas_results)
 
 def receive_a_qmail(port, srcAddr, srcPort, batch_size=4):
@@ -154,4 +157,14 @@ def receive_a_qmail(port, srcAddr, srcPort, batch_size=4):
     print("I am Bob I received: ", otpkey)
     classicC.close()
 
+    key_per_batch = [{'x':x,'z':z} for x,z in zip(wrap(otpkey['x'],batch_size),wrap(otpkey['z'],batch_size))]
 
+    # TODO: setup quantum channel
+    # TODO: receive qcirc with quantum channel
+    qcirc = None
+    # TODO: decrypt and measure
+    bob_meas_results = []
+    for k in key_per_batch:
+        bob_meas_results.append(qotp(qcirc, k))
+        print('Bob measures',bob_meas_results[-1])
+    print('Bobs message %s'%bins_to_str(bob_meas_results))
