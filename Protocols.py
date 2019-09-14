@@ -221,7 +221,7 @@ def apply_grover_oracle2(qcirc, dquery):
     else : pass
 
 
-def multiparty_2grover_local(dquery):
+def multiparty_2grover_local(port, destPort):
     """
     multiparties 2-qubit grover algorithm with separated oracle
     as the database owner (Oscar). Oscar has a confiedential database,
@@ -234,16 +234,25 @@ def multiparty_2grover_local(dquery):
     qcirc.h(0)    
     qcirc.h(1)  #at this point qcirc is in the equal superposition of all quantum states    
 
+    # TODO: setup quantum channel
+    n_master = 2
+    n_slave = 2
+    slave_offset = 0
+    channel = Channel(slave_offset, port, remote_port=destPort)
+
     print("Alice send qubits to Oscar, quering the database")
     # send ... Channel stuff......
+    channel.send(qcirc, [0,1])
 
-    print("Oscar receives qubits, and apply oracles")
-    apply_grover_oracle2(qcirc, dquery)
+    # print("Oscar receives qubits, and apply oracles")
+    # apply_grover_oracle2(qcirc, dquery)
 
-    print("Oscar sends the qubits back to Alice")
-    # send ... Channel stuff......
+    # print("Oscar sends the qubits back to Alice")
+    # # send ... Channel stuff......
 
     print("Alice receives qubits, apply diffusion operator, and measure")
+    qcirc, offset = channel.receive(qcirc)
+
     qcirc.h(0)
     qcirc.h(1)
     qcirc.cz(0,1)
@@ -254,3 +263,21 @@ def multiparty_2grover_local(dquery):
     counts = execute(qcirc, backend=simulator, shots = 1).result()
 
     print("Alice measurement outcome", list(counts.get_counts().keys())[0])
+
+
+def oscar_sends(dquery, port, srcPort):
+    # Init circuit
+    qcirc = QuantumCircuit(2,2) 
+    # TODO: setup quantum channel
+    n_master = 2
+    n_slave = 2
+    slave_offset = 0
+    channel = Channel(slave_offset, port, remote_port=srcPort)
+
+    print("Oscar receives qubits, and apply oracles")
+    qcirc, offset = channel.receive(qcirc)
+    apply_grover_oracle2(qcirc, dquery)
+
+    print("Oscar sends the qubits back to Alice")
+    # send ... Channel stuff......
+    channel.send(qcirc, [0,1])
