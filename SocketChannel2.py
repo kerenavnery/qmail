@@ -12,15 +12,15 @@ class SocketChannel(threading.Thread):
 		async for message in websocket:
 			# TODO: Add to message to consumer queue
 			self.producer(message)
-			print(message)
-			print("---")
+			# print(message)
+			# print("---")
 
 	def __init__(self, port=5005, listen=False):
 		self.port = port
 		threading.Thread.__init__(self)
 		self.start()
 		# consumer/producer buffer
-		self.BUFF_MAX_LEN = 10
+		self.BUFF_MAX_LEN = 1000
 		self.buff = deque(maxlen=self.BUFF_MAX_LEN)
 
 	def run(self):
