@@ -1,78 +1,85 @@
-import socket
-import sys
-import traceback
-from threading import Thread
-
+from SocketChannel2 import SocketChannel
 
 def main():
     start_server()
 
 
 def start_server():
-    host = "127.0.0.1"
-    port = 8888         # arbitrary non-privileged port
+    num_of_clients = 2;
+    tx_port = [1220, 1221]
+    rx_port = [1330, 1331]
 
-    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)   # SO_REUSEADDR flag tells the kernel to reuse a local socket in TIME_WAIT state, without waiting for its natural timeout to expire
-    print("Socket created")
+    clients = []
+    for client in range(num_of_clients):
+        client.append(SocketChannel(tx_port[client], True))
+        client.connect('localhost',rx_port[client])
+        client.send("Hello client %d".format(client))   
+        print("client %d sent: %s".format(client, client.recive()))
 
-    try:
-        soc.bind((host, port))
-    except:
-        print("Bind failed. Error : " + str(sys.exc_info()))
-        sys.exit()
+#     host = "127.0.0.1"
+#     port = 8888         # arbitrary non-privileged port
 
-    soc.listen(5)       # queue up to 5 requests
-    print("Socket now listening")
+#     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)   # SO_REUSEADDR flag tells the kernel to reuse a local socket in TIME_WAIT state, without waiting for its natural timeout to expire
+#     print("Socket created")
 
-    # infinite loop- do not reset for every requests
-    while True:
-        connection, address = soc.accept()
-        ip, port = str(address[0]), str(address[1])
-        print("Connected with " + ip + ":" + port)
+#     try:
+#         soc.bind((host, port))
+#     except:
+#         print("Bind failed. Error : " + str(sys.exc_info()))
+#         sys.exit()
 
-        try:
-            Thread(target=client_thread, args=(connection, ip, port)).start()
-        except:
-            print("Thread did not start.")
-            traceback.print_exc()
+#     soc.listen(5)       # queue up to 5 requests
+#     print("Socket now listening")
 
-    soc.close()
+#     # infinite loop- do not reset for every requests
+#     while True:
+#         connection, address = soc.accept()
+#         ip, port = str(address[0]), str(address[1])
+#         print("Connected with " + ip + ":" + port)
 
+#         try:
+#             Thread(target=client_thread, args=(connection, ip, port)).start()
+#         except:
+#             print("Thread did not start.")
+#             traceback.print_exc()
 
-def client_thread(connection, ip, port, max_buffer_size = 5120):
-    is_active = True
-
-    while is_active:
-        client_input = receive_input(connection, max_buffer_size)
-
-        if "--QUIT--" in client_input:
-            print("Client is requesting to quit")
-            connection.close()
-            print("Connection " + ip + ":" + port + " closed")
-            is_active = False
-        else:
-            print("Processed result: {}".format(client_input))
-            connection.sendall("-".encode("utf8"))
+#     soc.close()
 
 
-def receive_input(connection, max_buffer_size):
-    client_input = connection.recv(max_buffer_size)
-    client_input_size = sys.getsizeof(client_input)
+# def client_thread(connection, ip, port, max_buffer_size = 5120):
+#     is_active = True
 
-    if client_input_size > max_buffer_size:
-        print("The input size is greater than expected {}".format(client_input_size))
+#     while is_active:
+#         client_input = receive_input(connection, max_buffer_size)
 
-    decoded_input = client_input.decode("utf8").rstrip()  # decode and strip end of line
-    result = process_input(decoded_input)
+#         if "--QUIT--" in client_input:
+#             print("Client is requesting to quit")
+#             connection.close()
+#             print("Connection " + ip + ":" + port + " closed")
+#             is_active = False
+#         else:
+#             print("Processed result: {}".format(client_input))
+#             connection.sendall("-".encode("utf8"))
 
-    return result
+
+# def receive_input(connection, max_buffer_size):
+#     client_input = connection.recv(max_buffer_size)
+#     client_input_size = sys.getsizeof(client_input)
+
+#     if client_input_size > max_buffer_size:
+#         print("The input size is greater than expected {}".format(client_input_size))
+
+#     decoded_input = client_input.decode("utf8").rstrip()  # decode and strip end of line
+#     result = process_input(decoded_input)
+
+#     return result
 
 
-def process_input(input_str):
-    print("Processing the input received from client")
+# def process_input(input_str):
+#     print("Processing the input received from client")
 
-    return "Hello " + str(input_str).upper()
+#     return "Hello " + str(input_str).upper()
 
 if __name__ == "__main__":
     main()
