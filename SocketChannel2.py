@@ -12,19 +12,19 @@ class SocketChannel(threading.Thread):
 		async for message in websocket:
 			# TODO: Add to message to consumer queue
 			self.producer(message)
-			print(message)
-			print("---")
+			# print(message)
+			# print("---")
 
 	def __init__(self, port=5005, listen=False):
 		self.port = port
 		threading.Thread.__init__(self)
 		self.start()
 		# consumer/producer buffer
-		self.BUFF_MAX_LEN = 10
+		self.BUFF_MAX_LEN = 1000
 		self.buff = deque(maxlen=self.BUFF_MAX_LEN)
 
 	def run(self):
-		print("RUNNNN... port = " + str(self.port))
+		print("Running on port = " + str(self.port))
 		loop = asyncio.new_event_loop()
 		asyncio.set_event_loop(loop)
 		#asyncio.get_event_loop().
@@ -54,39 +54,36 @@ class SocketChannel(threading.Thread):
 	def producer(self, msg):
 		# print("Producer: hola")
 		while len(self.buff) >= self.BUFF_MAX_LEN:
-			print("SocketChannel: buffer is full, waiting...")
+			# print("SocketChannel: buffer is full, waiting...")
 			time.sleep(1)
 		self.buff.append(msg)
 
 	def consumer(self):
 		# print("Consumer: hola")
 		while len(self.buff) <= 0:
-			print("SocketChannel: the buff is empty, waiting...")
+			# print("SocketChannel: the buff is empty, waiting...")
 			time.sleep(1)
 		msg = self.buff.pop()
 		return msg
 
 ## EXAMPLE
 # # Initialize
-# alice = SocketChannel(1221, True)
-# bob = SocketChannel(1222, False)
-# print("hjkkhj")
+#alice = SocketChannel(1221, True)
+#bob = SocketChannel(1222, False)
 
-# alice.connect('localhost', 1222)
-# bob.connect('localhost', 1221)
+#alice.connect('localhost', 1222)
+#bob.connect('localhost', 1221)
 
-# # Send
-# print("asdf")
-# alice.send("Hello Alice here")
-# alice.send("Hello Alice here2")
-# alice.send("Hello Alice here3")
+# Send
+#alice.send("Hello Alice here")
+#alice.send("Hello Alice here2")
+#alice.send("Hello Alice here3")
+#bob.send("Hello Bob here")
 
-# bob.send("Hello Bob here")
-
-# alice.receive()
-# bob.receive()
-# bob.receive()
-# bob.receive()
+#alice.receive()
+#bob.receive()
+#bob.receive()
+#bob.receive()
 
 
 
