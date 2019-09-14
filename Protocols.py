@@ -178,8 +178,6 @@ def receive_a_qmail(port, srcAddr, srcPort, batch_size=4, adversary=False):
     slave_offset = 0
     channel = Channel(slave_offset, port, remote_port=srcPort)
 
-<<<<<<< HEAD
-=======
 # Grover-related methods
 
 def apply_grover_oracle2(qcirc, dquery):
@@ -233,7 +231,6 @@ def multiparty_2grover_local(dquery):
     counts = execute(qcirc, backend=simulator, shots = 1).result()
 
     print("Alice measurement outcome", list(counts.get_counts().keys())[0])
->>>>>>> 69cc2fff2f01942c86c69acd2c36cafa6c5a28e9
 
     qcirc = None
     # TODO: decrypt and measure
