@@ -192,7 +192,6 @@ def receive_a_qmail(port, srcAddr, srcPort, batch_size=4):
         simulator = Aer.get_backend('qasm_simulator')
         nqubit = len(otpkey['x'])
         # for i in range(nqubit):
-        print(np.arange(batch_size)+offset,offset)
         circ_bob.measure(np.arange(batch_size)+offset, range(batch_size))
         counts = execute(circ_bob, backend=simulator, shots = 1).result()
 

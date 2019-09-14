@@ -60,7 +60,7 @@ class Channel:
         print('Wait to receive')
         channel = self.realchannel #SocketChannel(port=5005, listen=True)
         data = channel.receive()
-        print("received stuff \o/")
+        # print("received stuff \o/")
         #print("received data:", data)
         channel.close()
         

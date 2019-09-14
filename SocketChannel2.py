@@ -54,14 +54,14 @@ class SocketChannel(threading.Thread):
 	def producer(self, msg):
 		# print("Producer: hola")
 		while len(self.buff) >= self.BUFF_MAX_LEN:
-			print("SocketChannel: buffer is full, waiting...")
+			# print("SocketChannel: buffer is full, waiting...")
 			time.sleep(1)
 		self.buff.append(msg)
 
 	def consumer(self):
 		# print("Consumer: hola")
 		while len(self.buff) <= 0:
-			print("SocketChannel: the buff is empty, waiting...")
+			# print("SocketChannel: the buff is empty, waiting...")
 			time.sleep(1)
 		msg = self.buff.pop()
 		return msg
