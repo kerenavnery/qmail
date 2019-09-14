@@ -12,8 +12,8 @@ class SocketChannel(threading.Thread):
 		async for message in websocket:
 			# TODO: Add to message to consumer queue
 			self.producer(message)
-			print(message)
-			print("---")
+			# print(message)
+			# print("---")
 
 	def __init__(self, port=5005, listen=False):
 		self.port = port
@@ -24,7 +24,7 @@ class SocketChannel(threading.Thread):
 		self.buff = deque(maxlen=self.BUFF_MAX_LEN)
 
 	def run(self):
-		print("RUNNNN... port = " + str(self.port))
+		print("Running on port = " + str(self.port))
 		loop = asyncio.new_event_loop()
 		asyncio.set_event_loop(loop)
 		#asyncio.get_event_loop().
@@ -68,25 +68,22 @@ class SocketChannel(threading.Thread):
 
 ## EXAMPLE
 # # Initialize
-# alice = SocketChannel(1221, True)
-# bob = SocketChannel(1222, False)
-# print("hjkkhj")
+#alice = SocketChannel(1221, True)
+#bob = SocketChannel(1222, False)
 
-# alice.connect('localhost', 1222)
-# bob.connect('localhost', 1221)
+#alice.connect('localhost', 1222)
+#bob.connect('localhost', 1221)
 
-# # Send
-# print("asdf")
-# alice.send("Hello Alice here")
-# alice.send("Hello Alice here2")
-# alice.send("Hello Alice here3")
+# Send
+#alice.send("Hello Alice here")
+#alice.send("Hello Alice here2")
+#alice.send("Hello Alice here3")
+#bob.send("Hello Bob here")
 
-# bob.send("Hello Bob here")
-
-# alice.receive()
-# bob.receive()
-# bob.receive()
-# bob.receive()
+#alice.receive()
+#bob.receive()
+#bob.receive()
+#bob.receive()
 
 
 
