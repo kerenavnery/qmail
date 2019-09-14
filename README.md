@@ -9,10 +9,12 @@ Alice and Bob have both some number of local qubits. Additionally they share a q
 
 ## Applications based on the quantum channel
 We implemented several use cases for quantum channels:
+### Quantum state exchange
+Sending an arbitrary quantum state over the channel.
 ### Quantum email (with QOTP)
 Sending messages over the quantum channel, encrypted using the Quantum One-Time-Pad.
 ### Quantum teleportation
-Teleporting of a single Qubit between two parties.
+Teleporting of a single qubit between two parties.
 ### Multiparty Grovers algorithm
 Bob holds a database and allows Alice to search elements. 
 
