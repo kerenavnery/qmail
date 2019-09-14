@@ -14,7 +14,7 @@ class SocketChannel(threading.Thread):
 			async for message in websocket:
 				# TODO: Add to message to consumer queue
 				self.producer(message)
-				print(message)
+				#print(message)
 				# print("---")
 			#print(str(self.port) + "release lock")
 
