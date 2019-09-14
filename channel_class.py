@@ -25,7 +25,13 @@ class Channel:
         self.realchannel.connect(TCP_IP, remote_port)
         
         self._circuit = None
-        
+    
+    def close(self):
+        try:
+            self.realchannel.kill()
+        except:
+            print("Exception: Thread still busy")
+
     def send(self,circuit,arr_qubits):
         self._state_vector = Statevector.from_instruction(circuit)  
         self._arr_qubits = arr_qubits
