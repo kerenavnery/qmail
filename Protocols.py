@@ -155,11 +155,13 @@ def send_a_qmail(message, port, destAddr, destPort, batch_size=4):
     # print('Bobs message %s'%bins_to_str(bob_meas_results)) #Bob
     # return bins_to_str(bob_meas_results)
 
-def receive_a_qmail(port, srcAddr, srcPort, batch_size=4):
+def receive_a_qmail(port, srcAddr, srcPort, batch_size=4, adversary=False):
         # Initialize with Bob
     classicC = SocketChannel(port+10, True)
     # connect to Bob
     classicC.connect(srcAddr, srcPort+10)
+
+    
 
     # receive otpkey from alice
     otpkey = classicC.receive()
@@ -176,18 +178,19 @@ def receive_a_qmail(port, srcAddr, srcPort, batch_size=4):
     slave_offset = 0
     channel = Channel(slave_offset, port, remote_port=srcPort)
 
-    # TODO: receive qcirc with quantum channel
-
 
     qcirc = None
     # TODO: decrypt and measure
+    # Eve siVmulation
+    recv = "Eve" if adversary else "Bob"
     bob_meas_results = []
     for k in key_per_batch:
         circ_bob = QuantumCircuit(batch_size, batch_size)
         circ_bob, offset = channel.receive(circ_bob)
         # circ_bob.draw(output='mpl',filename="teleport_alice%s.png".format(k))
         #Bob receives qubits, and decrypt them
-        otp_enc_dec(circ_bob, k)
+        if not adversary:
+            otp_enc_dec(circ_bob, k)
         #Bob measure the states, single shot
         simulator = Aer.get_backend('qasm_simulator')
         nqubit = len(otpkey['x'])
@@ -197,7 +200,7 @@ def receive_a_qmail(port, srcAddr, srcPort, batch_size=4):
 
         output = list(counts.get_counts().keys())[0]
         bob_meas_results.append(output)
-        print('Bob measures',bob_meas_results[-1])
-    print('Bobs message %s'%bins_to_str(bob_meas_results))
+        print('%s measures'%recv, bob_meas_results[-1])
+    print('%ss message %s'%(recv, bins_to_str(bob_meas_results)))
 
     return bins_to_str(bob_meas_results)

@@ -9,7 +9,7 @@ BOB_PORT = 5006
 
 def main():
 
-  Protocols.receive_a_qmail(BOB_PORT, ALICE_ADDR, ALICE_PORT)
+  Protocols.receive_a_qmail(BOB_PORT, ALICE_ADDR, ALICE_PORT, adversary=True)
 
   pass
 
