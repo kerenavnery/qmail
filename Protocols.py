@@ -161,8 +161,6 @@ def receive_a_qmail(port, srcAddr, srcPort, batch_size=4, adversary=False):
     # connect to Bob
     classicC.connect(srcAddr, srcPort+10)
 
-    
-
     # receive otpkey from alice
     otpkey = classicC.receive()
     otpkey = pickle.loads(otpkey)
@@ -177,7 +175,6 @@ def receive_a_qmail(port, srcAddr, srcPort, batch_size=4, adversary=False):
     n_slave = batch_size
     slave_offset = 0
     channel = Channel(slave_offset, port, remote_port=srcPort)
-
 
     qcirc = None
     # TODO: decrypt and measure
@@ -204,3 +201,56 @@ def receive_a_qmail(port, srcAddr, srcPort, batch_size=4, adversary=False):
     print('%ss message %s'%(recv, bins_to_str(bob_meas_results)))
 
     return bins_to_str(bob_meas_results)
+
+# Grover-related methods
+def apply_grover_oracle2(qcirc, dquery):
+    """
+    grover oracle for query database: 
+
+    :qcirc:QuantumCircuit, the qubits to apply
+    :query:str, 00 01 10 11
+    """
+    qcirc.cz(1,0)
+    if dquery == '11':
+        qcirc.z(0)
+        qcirc.z(1)
+    elif dquery == '01':
+        qcirc.z(1)
+    elif dquery == '10':
+        qcirc.z(0)
+    else : pass
+
+
+def multiparty_2grover_local(dquery):
+    """
+    multiparties 2-qubit grover algorithm with separated oracle
+    as the database owner (Oscar). Oscar has a confiedential database,
+    and will help Alice to reveal her data.
+
+    :dquery:str, 00 01 10 11
+    """
+    print("Alice creates state |00>")
+    qcirc = QuantumCircuit(2,2) 
+    qcirc.h(0)    
+    qcirc.h(1)  #at this point qcirc is in the equal superposition of all quantum states    
+
+    print("Alice send qubits to Oscar, quering the database")
+    # send ... Channel stuff......
+
+    print("Oscar receives qubits, and apply oracles")
+    apply_grover_oracle2(qcirc, dquery)
+
+    print("Oscar sends the qubits back to Alice")
+    # send ... Channel stuff......
+
+    print("Alice receives qubits, apply diffusion operator, and measure")
+    qcirc.h(0)
+    qcirc.h(1)
+    qcirc.cz(0,1)
+    qcirc.h(0)
+    qcirc.h(1)
+    qcirc.measure([0,1],[0,1])
+    simulator = Aer.get_backend('qasm_simulator')
+    counts = execute(qcirc, backend=simulator, shots = 1).result()
+
+    print("Alice measurement outcome", list(counts.get_counts().keys())[0])
