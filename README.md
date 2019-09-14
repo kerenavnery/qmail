@@ -19,3 +19,10 @@ We implemented several use cases for quantum channels:
 
 ## Usability
 
+## Members
+
+- Luca Dolfi, Switzerland
+- Marc Wyss, Switzerland
+- Keren Avnery, Israel
+- Cica Gustiani, Indonesia
+- Philippe Suchsland, Germany
